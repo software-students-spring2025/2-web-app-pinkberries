@@ -13,10 +13,43 @@
         <h1>Explore exhibitions!</h1>
         <nav>
           <a href="{{ url_for('home')}}">Home</a>
-          <a href="{{ url_for('search')}}">Search</a>
-          <a href="{{ url_for('login')}}">Login</a>
+          <a href="{{ url_for('search')}}">Search</a>  
+          <a href="{{ url_for('login')}}">Login</a>  
+          <button onclick="togglePopup()">Filter Exhibitions</button> <!--Added filter pop up-->
         </nav>
       </header>
+
+      <!-- Filter Popup -->
+      <div id="filterPopup" class="popup">
+        <form action="{{ url_for('filter_exhibitions') }}" method="GET">
+            <h3>Select Filters</h3>
+
+            <label>Art Style:</label><br>
+            <input type="checkbox" name="style" value="Modern"> Modern<br>
+            <input type="checkbox" name="style" value="Impressionist"> Impressionist<br>
+            <input type="checkbox" name="style" value="Abstract"> Abstract<br>
+
+            <label>Medium:</label><br>
+            <input type="checkbox" name="medium" value="Digital Art"> Digital Art<br>
+            <input type="checkbox" name="medium" value="Painting"> Painting<br>
+            <input type="checkbox" name="medium" value="Photography"> Photography<br>
+
+            <label>Event Type:</label><br>
+            <input type="checkbox" name="event_type" value="Pop-up"> Pop-up<br>
+            <input type="checkbox" name="event_type" value="Launch Party"> Launch Party<br>
+            <input type="checkbox" name="event_type" value="Exhibit"> Exhibit<br>
+
+            <label>Start Date:</label>
+            <input type="date" name="start_date"><br>
+
+            <label>End Date:</label>
+            <input type="date" name="end_date"><br>
+
+            <button type="submit">Search</button>
+            <button type="button" onclick="togglePopup()">Close</button>
+        </form>
+    </div>
+
       <main>{% block container %} {% endblock %}</main>
       <footer>
         <p>

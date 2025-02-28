@@ -2,169 +2,182 @@
 
 """
 Pinkberries flask-based web application.
-
 """
 
 import os
 import datetime
 from flask import Flask, render_template, request, redirect, url_for
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import pymongo
 from bson.objectid import ObjectId
-from dotenv import load_dotenv, dotenv_values ### You will need to install dotenv from terminal
+from dotenv import load_dotenv, dotenv_values
 
-load_dotenv()  # load environment variables from .env file
+# Load environment variables
+load_dotenv()
 
+# Create and configure Flask app
 def create_app():
-    """
-    Create and configure the Flask application.
-    returns: app: the Flask application object
-    """
-
     app = Flask(__name__)
-    # load flask config from env variables
-    config = dotenv_values()
-    app.config.from_mapping(config)
 
-    cxn = pymongo.MongoClient(os.getenv("MONGO_URI"))
-    db = cxn[os.getenv("MONGO_DBNAME")]
+    # MongoDB Configuration
+    MONGO_URI = os.getenv("MONGO_URI")
+    MONGO_DB = os.getenv("MONGO_DB")
+
+    client = pymongo.MongoClient(MONGO_URI)
+    db = client[MONGO_DB]
 
     try:
-        cxn.admin.command("ping")
-        print(" *", "Connected to MongoDB!")
+        client.admin.command("ping")
+        print("Successfully connected to MongoDB!")
     except Exception as e:
-        print(" * MongoDB connection error:", e)
+        print(" MongoDB connection error:", e)
+
+    return app, db
 
 
-    ### Add your functions here: ###
+app, db = create_app()
 
-    @app.route("/")
-    def home():
 
-    @app.route("/create_exhibit", methods=["POST"])
-    def create_exhibit():
-        """
-        Route for POST requests to the create page.
-        Accepts the form submission data for a new exhibit and saves the exhibition to the database.
-        Returns:
-            redirect (Response): A redirect response to the home page.
-        """
-        title = request.form["ftitle"]
-        dates = request.form["fdates"]
-        location = request.form["flocation"]
-        cost = request.form["fcost"]
-        artist = request.form["fartist"]
-        art_style = request.form["fart_style"]
-        art_medium = request.form["fart_medium"]
-        event_type = request.form["fevent_type"]
-        description = request.form["fdescription"]
-        image_url = request.form["fimage_url"]
-        created_by = request.form["created_by"]
-        exhibition = {
-            "Exhibition Title": title,
-            "Dates": dates,
-            "Location": location,
-            "Cost": cost,
-            "Artist": artist,
-            "Art Style": art_style,
-            "Art Medium": art_medium,
-            "Event Type": event_type,
-            "Description" : description,
-            "Image_url" : image_url,
-            "Created_by" : created_by,
-            "created_at": datetime.datetime.utcnow(),
-        }
-        db.exhibits.insert_one(exhibition)
+@app.route("/")
+def home():
+    return render_template("home.html") 
 
-        return redirect(url_for("home"))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        user = db.users.find_one({"username": username, "password": password})
+
+        if user:
+            login_user(User(str(user["_id"]), user["username"]))
+            flash("Login successful!", "success")
+            return redirect(url_for("home"))
+        
+        flash("Invalid credentials", "danger")
     
-    @app.route("/edit/<post_id>")
-    def edit(post_id):
-        """
-        Route for GET requests to the edit page.
-        Displays a form users can fill out to edit an existing record.
-        Args:
-            post_id (str): The ID of the post to edit.
-        Returns:
-            rendered template (str): The rendered HTML template.
-        """
-        exhibition = db.exhibits.find_one({"_id": ObjectId(post_id)})
-        return render_template("edit.html", exhibition=exhibition)
+    return render_template("login.html")
 
-    @app.route("/edit/<post_id>", methods=["POST"])
-    def edit_post(post_id):
-        """
-        Route for POST requests to the edit page.
-        Accepts the form submission data for the specified exhibit and updates the exhibit in the database.
-        Args:
-            post_id (str): The ID of the post to edit.
-        Returns:
-            redirect (Response): A redirect response to the home page.
-        """
-        title = request.form["ftitle"]
-        dates = request.form["fdates"]
-        location = request.form["flocation"]
-        cost = request.form["fcost"]
-        artist = request.form["fartist"]
-        art_style = request.form["fart_style"]
-        art_medium = request.form["fart_medium"]
-        event_type = request.form["fevent_type"]
-        description = request.form["fdescription"]
-        image_url = request.form["fimage_url"]
-        created_by = request.form["created_by"]
 
-        exhibition = {
-            "Exhibition Title": title,
-            "Dates": dates,
-            "Location": location,
-            "Cost": cost,
-            "Artist": artist,
-            "Art Style": art_style,
-            "Art Medium": art_medium,
-            "Event Type": event_type,
-            "Description" : description,
-            "Image url" : image_url,
-            "Created by" : created_by,
-            "Created at": datetime.datetime.utcnow(),
-        }
+@app.route("/search")
+def search():
+    return render_template("search.html")
 
-        db.exhibition.update_one({"_id": ObjectId(post_id)}, {"$set": exhibition})
 
-        return redirect(url_for("home"))
+@app.route("/filter", methods=["GET"])
+def filter_exhibitions():
+    style = request.args.getlist("style")
+    medium = request.args.getlist("medium")
+    event_type = request.args.getlist("event_type")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
 
-    @app.route("/delete/<post_id>")
-    def delete(post_id):
-        """
-        Route for GET requests to the delete page.
-        Deletes the specified record from the database, and then redirects the browser to the home page.
-        Args:
-            post_id (str): The ID of the post to delete.
-        Returns:
-            redirect (Response): A redirect response to the home page.
-        """
-        db.messages.delete_one({"_id": ObjectId(post_id)})
-        return redirect(url_for("home"))
+    # Build MongoDB query
+    query = {}
+    if style:
+        query["Art Style"] = {"$in": style}
+    if medium:
+        query["Art Medium"] = {"$in": medium}
+    if event_type:
+        query["Event Type"] = {"$in": event_type}
+    
+    # Handle date filtering
+    if start_date and end_date:
+        try:
+            start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            end_dt = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+            query["Dates"] = {"$gte": start_dt, "$lte": end_dt}
+        except ValueError:
+            return " Invalid date format, Use YYYY-MM-DD."
 
-    @app.route("/delete-by-content/<Created_by>/<Exhibition_title>", methods=["POST"])
-    def delete_by_content(Created_by, Exhibition_title):
-        """
-        Route for POST requests to delete exhibition by their creator's name and exhibit title.
-        Deletes the specified record from the database, and then redirects the browser to the home page.
-        Args:
-            Created_by (str): The name of the creator of the exhibit.
-            Exhibition_title (str): The title of the exhibition to be deleted.
-        Returns:
-            redirect (Response): A redirect response to the home page.
-        """
-        db.messages.delete_many({"Created by": Created_by, "Exhibition Title": Exhibition_title})
-        return redirect(url_for("home"))
+    # Fetch results from MongoDB
+    results = list(db.exhibits.find(query, {"_id": 0}))
 
-### Here is where the app gets created: ###
+    return render_template("filtered_results.html", results=results)
 
-app = create_app()
+@app.route("/create_exhibit", methods=["POST"])
+def create_exhibit():
+    title = request.form["ftitle"]
+    dates = request.form["fdates"]
+    location = request.form["flocation"]
+    cost = request.form["fcost"]
+    artist = request.form["fartist"]
+    art_style = request.form["fart_style"]
+    art_medium = request.form["fart_medium"]
+    event_type = request.form["fevent_type"]
+    description = request.form["fdescription"]
+    image_url = request.form["fimage_url"]
+    created_by = request.form["created_by"]
 
+    exhibition = {
+        "Exhibition Title": title,
+        "Dates": dates,
+        "Location": location,
+        "Cost": cost,
+        "Artist": artist,
+        "Art Style": art_style,
+        "Art Medium": art_medium,
+        "Event Type": event_type,
+        "Description": description,
+        "Image_url": image_url,
+        "Created_by": created_by,
+        "created_at": datetime.datetime.utcnow(),
+    }
+
+    db.exhibits.insert_one(exhibition)
+    return redirect(url_for("home"))
+
+@app.route("/edit/<post_id>")
+def edit(post_id):
+    exhibition = db.exhibits.find_one({"_id": ObjectId(post_id)})
+    return render_template("edit.html", exhibition=exhibition)
+
+@app.route("/edit/<post_id>", methods=["POST"])
+def edit_post(post_id):
+    title = request.form["ftitle"]
+    dates = request.form["fdates"]
+    location = request.form["flocation"]
+    cost = request.form["fcost"]
+    artist = request.form["fartist"]
+    art_style = request.form["fart_style"]
+    art_medium = request.form["fart_medium"]
+    event_type = request.form["fevent_type"]
+    description = request.form["fdescription"]
+    image_url = request.form["fimage_url"]
+    created_by = request.form["created_by"]
+
+    exhibition = {
+        "Exhibition Title": title,
+        "Dates": dates,
+        "Location": location,
+        "Cost": cost,
+        "Artist": artist,
+        "Art Style": art_style,
+        "Art Medium": art_medium,
+        "Event Type": event_type,
+        "Description": description,
+        "Image_url": image_url,
+        "Created_by": created_by,
+        "created_at": datetime.datetime.utcnow(),
+    }
+
+    db.exhibits.update_one({"_id": ObjectId(post_id)}, {"$set": exhibition})
+    return redirect(url_for("home"))
+
+@app.route("/delete/<post_id>")
+def delete(post_id):
+    db.exhibits.delete_one({"_id": ObjectId(post_id)})
+    return redirect(url_for("home"))
+
+@app.route("/delete-by-content/<Created_by>/<Exhibition_title>", methods=["POST"])
+def delete_by_content(Created_by, Exhibition_title):
+    db.exhibits.delete_many({"Created_by": Created_by, "Exhibition Title": Exhibition_title})
+    return redirect(url_for("home"))
+
+### Run Flask App ###
 if __name__ == "__main__":
     FLASK_PORT = os.getenv("FLASK_PORT", "5000")
     FLASK_ENV = os.getenv("FLASK_ENV")
     print(f"FLASK_ENV: {FLASK_ENV}, FLASK_PORT: {FLASK_PORT}")
-
-    app.run(port=FLASK_PORT)
+    app.run(port=int(FLASK_PORT), debug=True)

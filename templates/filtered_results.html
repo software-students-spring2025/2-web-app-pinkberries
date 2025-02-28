@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block container %}
+    <h1>Matching Exhibitions</h1>
+
+    {% if results %}
+        <ul>
+            {% for exhibit in results %}
+                <li>
+                    <strong>{{ exhibit['Exhibition Title'] }}</strong><br>
+                    <em>{{ exhibit['Art Style'] }} | {{ exhibit['Art Medium'] }} | {{ exhibit['Event Type'] }}</em><br>
+                    Location: {{ exhibit['Location'] }}<br>
+                    Dates: {{ exhibit['Dates'] }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No exhibitions match your filters.</p>
+    {% endif %}
+
+    <a href="{{ url_for('home') }}">Back to Home</a>
+{% endblock %}
