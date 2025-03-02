@@ -2,10 +2,12 @@
 """
 Pinkberries flask-based web application.
 """
+import certifi # resolve connection error for mongoDB
 import os
 import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import datetime
+from flask import Flask, render_template, request, redirect, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import pymongo
 from bson.objectid import ObjectId
 from dotenv import load_dotenv, dotenv_values  ### You will need to install dotenv from terminal
@@ -27,7 +29,7 @@ def create_app():
     config = dotenv_values()
     app.config.from_mapping(config)
 
-    # MongoDB Configuration
+   # MongoDB Configuration
     MONGO_URI = os.getenv("MONGO_URI")
     MONGO_DB = os.getenv("MONGO_DB")
 
@@ -40,22 +42,49 @@ def create_app():
     except Exception as e:
         print(" MongoDB connection error:", e)
 
-    return app, db  # ✅ Now correctly returning app and db
+    return app, db  # Now correctly returning app and db
 
 
-# ✅ Flask app and database created here
+# Flask app and database created here
 app, db = create_app()
 
 
+
 ### Add your functions here: ###
+## For Gallery Owner login function!
+class GalleryOwner(UserMixin):
+    def __init__(self, owner_id, username):
+        self.id = str(owner_id)
+        self.username = username
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(owner_id):
+    owner_data = db.gallery_owners.find_one({"_id": ObjectId(owner_id)})
+    if owner_data:
+        return GalleryOwner(owner_data["_id"], owner_data["username"])
+    else:
+        return None
+
+
 @app.route("/")
 def home():
-    """
-    Fetches all exhibitions and displays them on the home page.
-    """
     try:
-        exhibitions = list(db.exhibitions.find())  # ✅ Ensure exhibitions collection is used
+        # Fetch all exhibitions from the database without date filtering
+        exhibitions = list(db.exhibitions.find())
+            
+        # Handle case where exhibitions might be None or empty
+        if exhibitions is None:
+            exhibitions = []
+        
+        #print("Exhibitions from the database:", exhibitions)
+        # Pass the fetched exhibitions to the template
         return render_template("index.html", exhibitions=exhibitions)
+        
     except Exception as e:
         print(f"Error occurred while fetching exhibitions: {e}")
         return f"An error occurred while fetching the exhibitions: {e}", 500
@@ -99,9 +128,35 @@ def filter_exhibitions():
             return "Invalid date format. Use YYYY-MM-DD."
 
     # Fetch results from MongoDB
-    results = list(db.exhibitions.find(query, {"_id": 0}))  # ✅ Fixed to use "exhibitions"
-
+    results = list(db.exhibitions.find(query, {"_id": 0})) 
     return render_template("filtered_results.html", results=results)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        owner_data = db.gallery_owners.find_one({"username": username})
+
+        if owner_data and owner_data["password"] == password:
+            owner = GalleryOwner(owner_data["_id"], owner_data["username"])
+            login_user(owner) 
+            flash("Login successful!", "success")
+            return redirect(url_for("gallery_owner_page"))
+        else:
+            flash("Gallery not found in database!", "error")
+
+    return render_template("login.html")
+
+    # TEAMMATE NEED TO EDIT THIS!! THIS IS TEMPORRY
+    ###############################
+@app.route("/gallery_owner") 
+@login_required
+def gallery_owner_page():
+    return f"Welcome, {current_user.username}! This is the Gallery Owner Dashboard."
+
 
 
 @app.route("/exhibition/<exhibition_id>")
