@@ -1,65 +1,90 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title></title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>Explore exhibitions!</h1>
-        <nav>
-          <a href="{{ url_for('home')}}">Home</a>
-          <a href="{{ url_for('search')}}">Search</a>  
-          <a href="{{ url_for('login')}}">Login</a>  
-          <button onclick="togglePopup()">Filter Exhibitions</button> <!--Added filter pop up-->
-        </nav>
-      </header>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pinkberries Exhibitions{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-100 p-4">
 
-      <!-- Filter Popup -->
-      <div id="filterPopup" class="popup">
-        <form action="{{ url_for('filter_exhibitions') }}" method="GET">
-            <h3>Select Filters</h3>
+    <!-- Navbar -->
+    <nav class="bg-pink-700 text-white p-4 rounded-md shadow-md mb-6">
+        <div class="max-w-screen-lg mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-semibold">Pinkberries</a>
+            <div class="space-x-4">
+                <a href="/login" class="hover:bg-pink-500 px-3 py-2 rounded-md">Login</a>
+                <a href="/search" class="hover:bg-pink-500 px-3 py-2 rounded-md">Search</a>
+                <a href="/create_exhibit" class="bg-pink-500 hover:bg-pink-400 px-4 py-2 rounded-md text-white">Create Exhibition</a>
+                <button onclick="togglePopup()" class="bg-white text-pink-700 px-4 py-2 rounded-md border border-pink-500 hover:bg-pink-200">
+                  Filter Exhibitions
+              </button>
+          </div>
+      </div>
+  </nav>
 
-            <label>Art Style:</label><br>
-            <input type="checkbox" name="style" value="Modern"> Modern<br>
-            <input type="checkbox" name="style" value="Impressionist"> Impressionist<br>
-            <input type="checkbox" name="style" value="Abstract"> Abstract<br>
+  <!-- Filter Popup -->
+  <div id="filterPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+          <form action="{{ url_for('filter_exhibitions') }}" method="GET">
+              <h3 class="text-lg font-semibold mb-4">Select Filters</h3>
 
-            <label>Medium:</label><br>
-            <input type="checkbox" name="medium" value="Digital Art"> Digital Art<br>
-            <input type="checkbox" name="medium" value="Painting"> Painting<br>
-            <input type="checkbox" name="medium" value="Photography"> Photography<br>
+              <label class="block font-medium">Art Style:</label>
+              <div class="space-y-2 mb-4">
+                  <input type="checkbox" name="style" value="Modern"> Modern<br>
+                  <input type="checkbox" name="style" value="Impressionist"> Impressionist<br>
+                  <input type="checkbox" name="style" value="Abstract"> Abstract<br>
+              </div>
 
-            <label>Event Type:</label><br>
-            <input type="checkbox" name="event_type" value="Pop-up"> Pop-up<br>
-            <input type="checkbox" name="event_type" value="Launch Party"> Launch Party<br>
-            <input type="checkbox" name="event_type" value="Exhibit"> Exhibit<br>
+              <label class="block font-medium">Medium:</label>
+              <div class="space-y-2 mb-4">
+                  <input type="checkbox" name="medium" value="Digital Art"> Digital Art<br>
+                  <input type="checkbox" name="medium" value="Painting"> Painting<br>
+                  <input type="checkbox" name="medium" value="Photography"> Photography<br>
+              </div>
 
-            <label>Start Date:</label>
-            <input type="date" name="start_date"><br>
+              <label class="block font-medium">Event Type:</label>
+              <div class="space-y-2 mb-4">
+                  <input type="checkbox" name="event_type" value="Pop-up"> Pop-up<br>
+                  <input type="checkbox" name="event_type" value="Launch Party"> Launch Party<br>
+                  <input type="checkbox" name="event_type" value="Exhibit"> Exhibit<br>
+              </div>
 
-            <label>End Date:</label>
-            <input type="date" name="end_date"><br>
+              <label class="block font-medium">Start Date:</label>
+              <input type="date" name="start_date" class="w-full p-2 border rounded mb-4">
 
-            <button type="submit">Search</button>
-            <button type="button" onclick="togglePopup()">Close</button>
-        </form>
-    </div>
+              <label class="block font-medium">End Date:</label>
+              <input type="date" name="end_date" class="w-full p-2 border rounded mb-4">
 
-      <main>{% block container %} {% endblock %}</main>
-      <footer>
-        <p>
-            Source code available at
-          <a
-            href="https://github.com/software-students-spring2025/2-web-app-pinkberries"
-            >available on Github</a
-          >.
-        </p>
-      </footer>
-    </div>
-  </body>
+              <div class="flex justify-between">
+                  <button type="submit" class="bg-pink-500 text-white px-4 py-2 rounded-md">Search</button>
+                  <button type="button" onclick="togglePopup()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Close</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <script>
+      function togglePopup() {
+          var popup = document.getElementById("filterPopup");
+          popup.classList.toggle("hidden");
+      }
+  </script>
+
+
+
+    <!-- Main content area -->
+    <main class="max-w-screen-lg mx-auto">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="text-pink-700 py-8 mt-12">
+        <div class="max-w-screen-lg mx-auto text-center">
+            <p class="text-sm">
+                Source code
+                <a href="https://github.com/software-students-spring2025/2-web-app-pinkberries" target="_blank" class="text-pink-300 hover:text-pink-500">
+                    available on Github</a>.
+            </p>
+        </div>
+    </footer>
+</body>
 </html>
