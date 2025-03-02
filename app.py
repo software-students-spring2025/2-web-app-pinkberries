@@ -6,7 +6,7 @@ import certifi # resolve connection error for mongoDB
 import os
 import datetime
 import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import pymongo
 from bson.objectid import ObjectId
@@ -48,16 +48,12 @@ def create_app():
 # Flask app and database created here
 app, db = create_app()
 
-
-
 ### Add your functions here: ###
 ## For Gallery Owner login function!
 class GalleryOwner(UserMixin):
     def __init__(self, owner_id, username):
         self.id = str(owner_id)
         self.username = username
-
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -69,7 +65,6 @@ def load_user(owner_id):
         return GalleryOwner(owner_data["_id"], owner_data["username"])
     else:
         return None
-
 
 @app.route("/")
 def home():
@@ -140,23 +135,72 @@ def login():
 
         owner_data = db.gallery_owners.find_one({"username": username})
 
-        if owner_data and owner_data["password"] == password:
-            owner = GalleryOwner(owner_data["_id"], owner_data["username"])
-            login_user(owner) 
-            flash("Login successful!", "success")
-            return redirect(url_for("gallery_owner_page"))
+        if owner_data:
+            print(f"Found user: {owner_data['username']}")
+            if owner_data["password"] == password:
+                print("Password match successful!")
+                owner = GalleryOwner(owner_data["_id"], owner_data["username"])
+                login_user(owner)
+                return redirect(url_for("my_exhibits"))
+            else:
+                flash("Incorrect password", "error")
         else:
             flash("Gallery not found in database!", "error")
 
     return render_template("login.html")
 
-    # TEAMMATE NEED TO EDIT THIS!! THIS IS TEMPORRY
-    ###############################
-@app.route("/gallery_owner") 
-@login_required
-def gallery_owner_page():
-    return f"Welcome, {current_user.username}! This is the Gallery Owner Dashboard."
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()  # Log the user out
+    #flash('You have been logged out.', 'info')  # Optional flash message
+    return redirect(url_for('home'))
+
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+
+        # Check if passwords match
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for('create_account'))
+
+        # Check if username already exists
+        existing_user = db.gallery_owners.find_one({"username": username})
+        if existing_user:
+            flash("Username already exists. Please choose a different one.", "error")
+            return redirect(url_for('create_account'))
+
+        # Create user data (save username and password)
+        test_user = {
+            "username": username,
+            "password": password, 
+            "created_at": datetime.datetime.utcnow() 
+        }
+        db.gallery_owners.insert_one(test_user)
+        
+        flash('Account created successfully! Please log in.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('create_account.html')
+
+@app.route("/my_exhibits")
+@login_required
+def my_exhibits():
+    # Fetch exhibitions created by the logged-in user
+    user_exhibitions = list(db.exhibitions.find({"created_by": current_user.username}))
+
+    # Check if the list is empty
+    if len(user_exhibitions) == 0:
+        no_exhibitions = True
+    else:
+        no_exhibitions = False
+
+    return render_template("my_exhibits.html", exhibitions=user_exhibitions, no_exhibitions=no_exhibitions)
 
 
 @app.route("/exhibition/<exhibition_id>")
@@ -173,6 +217,7 @@ def exhibition_detail(exhibition_id):
 
 
 @app.route("/create_exhibit", methods=["GET", "POST"])
+@login_required
 def create_exhibit():
     """
     Route for GET, POST requests to the create page.
@@ -180,6 +225,9 @@ def create_exhibit():
     Returns:
         redirect (Response): A redirect response to the home page.
     """
+    if not current_user.is_authenticated:
+        flash("You must be logged in as a gallery owner to create an exhibit.", "error")
+        return redirect(url_for("login"))
     if request.method == "POST":
         title = request.form["ftitle"]
         start = request.form["start_date"]
@@ -193,7 +241,7 @@ def create_exhibit():
         event_type = request.form["fevent_type"]
         description = request.form["fdescription"]
         image_url = request.form["fimage_url"]
-        created_by = request.form["created_by"]
+        created_by = current_user.username
 
         exhibition = {
             "title": title,
@@ -211,12 +259,13 @@ def create_exhibit():
         }
 
         db.exhibitions.insert_one(exhibition)
-        return redirect(url_for("home"))
+        return redirect(url_for("my_exhibits"))
 
     return render_template("create_exhibit.html")
 
 
-@app.route("/edit/<post_id>")
+@app.route("/edit/<post_id>", methods=["GET"])
+@login_required
 def edit(post_id):
     """
     Route for GET requests to the edit page.
@@ -227,7 +276,11 @@ def edit(post_id):
         rendered template (str): The rendered HTML template.
     """
     exhibition = db.exhibitions.find_one({"_id": ObjectId(post_id)})
-    return render_template("edit.html", exhibition=exhibition)
+    if exhibition and exhibition["created_by"] == current_user.username:
+        return render_template("edit.html", exhibition=exhibition)
+    else:
+        flash("You are not authorized to edit this exhibition.", "error")
+        return redirect(url_for("home"))
 
 
 @app.route("/edit/<exhibition_id>", methods=["POST"])
@@ -262,7 +315,7 @@ def edit_post(exhibition_id):
     if updated_exhibition:
         db.exhibitions.update_one({"_id": ObjectId(exhibition_id)}, {"$set": updated_exhibition})
 
-    return redirect(url_for("exhibition_detail", exhibition_id=exhibition_id))
+    return redirect(url_for("my_exhibits", exhibition_id=exhibition_id))
 
 
 @app.route("/delete/<exhibition_id>", methods=["POST"])
@@ -278,8 +331,7 @@ def delete(exhibition_id):
             flash('Exhibition not found or already deleted.', 'error')
             return redirect(url_for('home'))
 
-        flash('Exhibition successfully deleted.', 'success')
-        return redirect(url_for("home"))
+        return redirect(url_for('my_exhibits'))
 
     except Exception as e:
         flash(f"An error occurred while deleting the exhibition: {str(e)}", 'error')

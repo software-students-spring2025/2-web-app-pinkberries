@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}My Exhibits{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold text-center text-pink-700 mb-6">My Exhibits</h1>
+
+    {% if no_exhibitions %}
+    <div class="text-center mt-6">
+        <p class="text-lg font-semibold text-gray-700 mb-4">You have no exhibits posted.</p>
+        <a href="{{ url_for('create_exhibit') }}" class="bg-pink-600 text-white py-3 px-8 rounded-lg shadow-lg hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 text-lg">
+            Create Exhibit
+        </a>
+    </div>
+   {% else %}
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 max-w-screen-lg w-full px-4">
+        {% for exhibition in exhibitions %}
+            <a href="/exhibition/{{ exhibition._id }}" class="bg-white rounded-2xl shadow-lg p-4">
+                <div>
+                    {% if exhibition.image_url %}
+                        <img src="{{ exhibition.image_url }}" alt="{{ exhibition.title }}" class="w-full h-32 object-cover rounded-lg">
+                    {% else %}
+                        <div class="w-full h-32 bg-pink-300 rounded-lg flex items-center justify-center text-white font-bold">
+                            No Image
+                        </div>
+                    {% endif %}
+                    <h2 class="text-lg font-bold mt-2">{{ exhibition.title }}</h2>
+                    <p class="text-sm text-gray-600">{{ exhibition.dates.start }} - {{ exhibition.dates.end }}</p>
+                    <p class="text-sm text-gray-700"><strong>Location:</strong> {{ exhibition.location }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}

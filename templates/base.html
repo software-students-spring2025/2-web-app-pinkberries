@@ -13,13 +13,24 @@
         <div class="max-w-screen-lg mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-semibold">Pinkberries</a>
             <div class="space-x-4">
-                <a href="/login" class="hover:bg-pink-500 px-3 py-2 rounded-md">Login</a>
-                <a href="/search" class="hover:bg-pink-500 px-3 py-2 rounded-md">Search</a>
-                <a href="/create_exhibit" class="bg-pink-500 hover:bg-pink-400 px-4 py-2 rounded-md text-white">Create Exhibition</a>
-                <button onclick="togglePopup()" class="bg-white text-pink-700 px-4 py-2 rounded-md border border-pink-500 hover:bg-pink-200">
-                  Filter Exhibitions
-              </button>
-          </div>
+                <a href="/" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Home</a>
+            
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Login</a>
+                {% endif %}
+                
+                <a href="/search" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Search</a>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="/my_exhibits" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">My Exhibits</a>
+                {% endif %}
+                
+                <a href="/create_exhibit" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Create Exhibition</a>
+                
+                <button onclick="togglePopup()" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md border border-pink-500">Filter Exhibitions</button>
+            </div>
       </div>
   </nav>
 
