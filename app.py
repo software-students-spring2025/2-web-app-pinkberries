@@ -286,6 +286,7 @@ def edit_post(exhibition_id):
     title = request.form.get("ftitle")
     if title:
         updated_exhibition["title"] = title
+
     start = request.form.get("start_date")
     end = request.form.get("end_date")
     if start or end:
@@ -293,17 +294,48 @@ def edit_post(exhibition_id):
             "start": start if start else exhibition["dates"]["start"],
             "end": end if end else exhibition["dates"]["end"]
         }
+
     location = request.form.get("flocation")
     if location:
         updated_exhibition["location"] = location
+
     cost = request.form.get("fcost")
     if cost:
         updated_exhibition["cost"] = cost
+
+    artist = request.form.get("fartist")
+    if artist:
+        updated_exhibition["artist"] = {"artist": artist}
+
+    artist_url = request.form.get("farturl")
+    if artist_url:
+        updated_exhibition["artist"]["profile_url"] = artist_url
+
+    art_style = request.form.get("fart_style")
+    if art_style:
+        updated_exhibition["art_style"] = art_style
+
+    art_medium = request.form.get("fart_medium")
+    if art_medium:
+        updated_exhibition["art_medium"] = art_medium
+
+    event_type = request.form.get("fevent_type")
+    if event_type:
+        updated_exhibition["event_type"] = event_type
+
+    description = request.form.get("fdescription")
+    if description:
+        updated_exhibition["description"] = description
+
+    image_url = request.form.get("fimage_url")
+    if image_url:
+        updated_exhibition["image_url"] = image_url
 
     if updated_exhibition:
         db.exhibitions.update_one({"_id": ObjectId(exhibition_id)}, {"$set": updated_exhibition})
 
     return redirect(url_for("my_exhibits", exhibition_id=exhibition_id))
+
 
 
 @app.route("/delete/<exhibition_id>", methods=["POST"])
