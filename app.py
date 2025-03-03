@@ -85,13 +85,6 @@ def home():
         return f"An error occurred while fetching the exhibitions: {e}", 500
 
 
-@app.route("/search")
-def search():
-    """
-    Renders the search page.
-    """
-    return render_template("search.html")
-
 
 @app.route("/filter", methods=["GET"])
 def filter_exhibitions():
@@ -107,20 +100,16 @@ def filter_exhibitions():
     # Build MongoDB query
     query = {}
     if style:
-        query["Art Style"] = {"$in": style}
+        query["art_style"] = {"$in": style}
     if medium:
-        query["Art Medium"] = {"$in": medium}
+        query["art_medium"] = {"$in": medium}
     if event_type:
-        query["Event Type"] = {"$in": event_type}
+        query["event_type"] = {"$in": event_type}
     
     # Handle date filtering
     if start_date and end_date:
-        try:
-            start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-            end_dt = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-            query["Dates"] = {"$gte": start_dt, "$lte": end_dt}
-        except ValueError:
-            return "Invalid date format. Use YYYY-MM-DD."
+        # Compare string dates (YYYY-MM-DD) directly
+        query["dates.start"] = {"$gte": start_date, "$lte": end_date}
 
     # Fetch results from MongoDB
     results = list(db.exhibitions.find(query, {"_id": 0})) 

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block container %}
+{% block content %}
     <h1>Matching Exhibitions</h1>
 
     {% if results %}
         <ul>
             {% for exhibit in results %}
                 <li>
-                    <strong>{{ exhibit['Exhibition Title'] }}</strong><br>
-                    <em>{{ exhibit['Art Style'] }} | {{ exhibit['Art Medium'] }} | {{ exhibit['Event Type'] }}</em><br>
-                    Location: {{ exhibit['Location'] }}<br>
-                    Dates: {{ exhibit['Dates'] }}
+                    <strong>{{ exhibit.title }}</strong><br>
+                    <em>{{ exhibit.art_style }} | {{ exhibit.art_medium }} | {{ exhibit.event_type }}</em><br>
+                    Location: {{ exhibit.location }}<br>
+                    Dates: {{ exhibit.dates.start }} - {{ exhibit.dates.end }}
                 </li>
             {% endfor %}
         </ul>
