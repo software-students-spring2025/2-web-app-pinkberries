@@ -108,11 +108,11 @@ def filter_exhibitions():
     
     # Handle date filtering
     if start_date and end_date:
-        # Compare string dates (YYYY-MM-DD) directly
-        query["dates.start"] = {"$gte": start_date, "$lte": end_date}
+        query["dates.start"] = {"$lte": end_date} 
+        query["dates.end"] = {"$gte": start_date}  
 
     # Fetch results from MongoDB
-    results = list(db.exhibitions.find(query, {"_id": 0})) 
+    results = list(db.exhibitions.find(query))
     return render_template("filtered_results.html", results=results)
 
 

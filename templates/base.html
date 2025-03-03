@@ -21,7 +21,6 @@
                     <a href="{{ url_for('login') }}" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Login</a>
                 {% endif %}
                 
-                <a href="/search" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Search</a>
                 
                 {% if current_user.is_authenticated %}
                     <a href="/my_exhibits" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">My Exhibits</a>
@@ -36,44 +35,71 @@
 
   <!-- Filter Popup -->
   <div id="filterPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-          <form action="{{ url_for('filter_exhibitions') }}" method="GET">
-              <h3 class="text-lg font-semibold mb-4">Select Filters</h3>
+    <div class="bg-pink-50 p-8 rounded-xl shadow-2xl w-96">
+        <form action="{{ url_for('filter_exhibitions') }}" method="GET">
+            <h3 class="text-xl font-bold mb-6 text-pink-700">Select Filters</h3>
 
-              <label class="block font-medium">Art Style:</label>
-              <div class="space-y-2 mb-4">
-                  <input type="checkbox" name="style" value="Modern"> Modern<br>
-                  <input type="checkbox" name="style" value="Impressionist"> Impressionist<br>
-                  <input type="checkbox" name="style" value="Abstract"> Abstract<br>
-              </div>
+            <label class="block text-lg font-medium text-pink-600">Art Style:</label>
+            <div class="space-y-2 mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="style" value="Modern" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Modern</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="style" value="Impressionist" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Impressionist</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="style" value="Abstract" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Abstract</span>
+                </label>
+            </div>
 
-              <label class="block font-medium">Medium:</label>
-              <div class="space-y-2 mb-4">
-                  <input type="checkbox" name="medium" value="Digital Art"> Digital Art<br>
-                  <input type="checkbox" name="medium" value="Painting"> Painting<br>
-                  <input type="checkbox" name="medium" value="Photography"> Photography<br>
-              </div>
+            <label class="block text-lg font-medium text-pink-600">Medium:</label>
+            <div class="space-y-2 mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="medium" value="Digital Art" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Digital Art</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="medium" value="Paintings" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Paintings</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="medium" value="Mixed Media" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Mixed Media</span>
+                </label>
+            </div>
 
-              <label class="block font-medium">Event Type:</label>
-              <div class="space-y-2 mb-4">
-                  <input type="checkbox" name="event_type" value="Pop-up"> Pop-up<br>
-                  <input type="checkbox" name="event_type" value="Launch Party"> Launch Party<br>
-                  <input type="checkbox" name="event_type" value="Exhibit"> Exhibit<br>
-              </div>
+            <label class="block text-lg font-medium text-pink-600">Event Type:</label>
+            <div class="space-y-2 mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="event_type" value="Pop-up" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Pop-up</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="event_type" value="Launch Party" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Launch Party</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="event_type" value="Exhibit" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Exhibit</span>
+                </label>
+            </div>
 
-              <label class="block font-medium">Start Date:</label>
-              <input type="date" name="start_date" class="w-full p-2 border rounded mb-4">
+            <label class="block text-lg font-medium text-pink-600">Start Date:</label>
+            <input type="date" name="start_date" class="w-full p-2 border border-pink-300 rounded mb-4">
 
-              <label class="block font-medium">End Date:</label>
-              <input type="date" name="end_date" class="w-full p-2 border rounded mb-4">
+            <label class="block text-lg font-medium text-pink-600">End Date:</label>
+            <input type="date" name="end_date" class="w-full p-2 border border-pink-300 rounded mb-4">
 
-              <div class="flex justify-between">
-                  <button type="submit" class="bg-pink-500 text-white px-4 py-2 rounded-md">Search</button>
-                  <button type="button" onclick="togglePopup()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Close</button>
-              </div>
-          </form>
-      </div>
-  </div>
+            <div class="flex justify-between">
+                <button type="submit" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2 rounded-md">Search</button>
+                <button type="button" onclick="togglePopup()" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
 
   <script>
       function togglePopup() {
