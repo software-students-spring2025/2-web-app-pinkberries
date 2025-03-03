@@ -2,17 +2,16 @@
 """
 Pinkberries flask-based web application.
 """
-import certifi # resolve connection error for mongoDB
+from datetime import date
 import os
-import datetime
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import pymongo
 from bson.objectid import ObjectId
 from dotenv import load_dotenv, dotenv_values  ### You will need to install dotenv from terminal
-from datetime import date
 from pymongo import MongoClient
+import certifi # resolve connection error for mongoDB
 
 # Load environment variables
 load_dotenv()
@@ -202,7 +201,7 @@ def exhibition_detail(exhibition_id):
     if not exhibition:
         return "Exhibition not found", 404
     
-    return render_template("exhibition_detail.html", exhibition=exhibition)
+    return render_template("exhibition_detail.html", exhibition=exhibition, saved_exhibitions=saved_exhibitions)
 
 
 @app.route("/create_exhibit", methods=["GET", "POST"])
@@ -325,7 +324,25 @@ def delete(exhibition_id):
     except Exception as e:
         flash(f"An error occurred while deleting the exhibition: {str(e)}", 'error')
         return redirect(url_for("home"))
+    
+saved_exhibitions = []
+@app.route("/save_exhibition/<exhibition_id>", methods=["POST"])
+def save_exhibition(exhibition_id):
+    """Save an exhibition using a global list (local use only)."""
+    if exhibition_id not in saved_exhibitions:
+        saved_exhibitions.append(exhibition_id)
+    return redirect(url_for("exhibition_detail", exhibition_id=exhibition_id))
 
+@app.route("/saved_exhibitions")
+def saved_exhibitions_page():
+    saved_exhibits = list(db.exhibitions.find({"_id": {"$in": [ObjectId(eid) for eid in saved_exhibitions]}}))
+    return render_template("saved_exhibitions.html", saved_exhibitions=saved_exhibits)
+
+@app.route("/remove_saved_exhibition/<exhibition_id>", methods=["POST"])
+def remove_saved_exhibition(exhibition_id):
+    if exhibition_id in saved_exhibitions:
+        saved_exhibitions.remove(exhibition_id)
+    return redirect(url_for("saved_exhibitions_page"))
 
 ### Run Flask App ###
 if __name__ == "__main__":

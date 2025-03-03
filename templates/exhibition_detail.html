@@ -23,6 +23,18 @@
                 <p class="text-lg text-gray-600"><strong>Medium:</strong> {{ exhibition.art_medium }}</p>
                 <p class="text-lg text-gray-600"><strong>Event Type:</strong> {{ exhibition.event_type }}</p>
                 <p class="mt-4">{{ exhibition.description }}</p>
+
+                <form action="{{ url_for('save_exhibition', exhibition_id=exhibition._id) }}" method="POST">
+                    {% if exhibition._id|string in saved_exhibitions %}
+                        <button type="button" class="bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed" disabled>
+                            Saved
+                        </button>
+                    {% else %}
+                        <button type="submit" class="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-md">
+                            Save Exhibition
+                        </button>
+                    {% endif %}
+                </form>
                 
                 {% if current_user.is_authenticated and exhibition.created_by == current_user.username %}
                 <div class="text-center mt-6 flex space-x-4">  <!-- flex added here to align buttons horizontally -->
