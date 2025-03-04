@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Ensure text elements wrap properly */
+    .long-text {
+        word-wrap: break-word;   /* Ensure long words break to the next line */
+        overflow-wrap: break-word; /* Ensure long text wraps within its container */
+        word-break: break-word;  /* Handles very long words that would overflow */
+    }
+
+    /* Optional: Make sure the grid items maintain consistency */
+    .exhibition-container {
+        max-width: 100%;
+        height: 100%;
+    }
+</style>
     <h1 class="text-3xl font-bold text-center text-pink-700 mb-6">Matching Exhibitions</h1>
     <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 max-w-screen-lg w-full px-4">
         {% for exhibit in results %}
@@ -14,9 +28,9 @@
                                 No Image
                             </div>
                         {% endif %}
-                        <h2 class="text-lg font-bold mt-2">{{ exhibit.title }}</h2>
-                        <p class="text-sm text-gray-600">{{ exhibit.dates.start }} - {{ exhibit.dates.end }}</p>
-                        <p class="text-sm text-gray-700"><strong>Location:</strong> {{ exhibit.location }}</p>
+                        <h2 class="text-lg font-bold mt-2 long-text">{{ exhibit.title }}</h2>
+                        <p class="text-sm text-gray-600 long-text">{{ exhibit.dates.start }} - {{ exhibit.dates.end }}</p>
+                        <p class="text-sm text-gray-700 long-text"><strong>Location:</strong> {{ exhibit.location }}</p>
                     </div>
                 </a>
             </div>
