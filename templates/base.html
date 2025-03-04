@@ -25,6 +25,7 @@
             <!-- Links for Desktop and Mobile -->
             <div id="nav-links" class="hidden lg:flex space-x-4">
                 <a href="/" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Home</a>
+                <a href="/about" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">About</a>
                 <a href="/saved_exhibitions" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Saved</a>
 
                 {% if current_user.is_authenticated %}
@@ -42,10 +43,13 @@
                 <!-- Filter button as an anchor tag to match others -->
                 <a href="#" onclick="togglePopup()" class="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-md border border-pink-500 cursor-pointer">Filter Exhibitions</a>
             </div>
+        </div>
 
-            <!-- Mobile Dropdown Menu -->
-            <div id="mobile-menu" class="lg:hidden absolute top-16 left-0 w-full bg-pink-700 text-white shadow-md rounded-md hidden max-w-screen-lg mx-auto p-4 mb-6">
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="lg:hidden absolute top-[4.4rem] left-0 bg-pink-700 text-white shadow-md rounded-md max-w-screen-lg mx-4 w-[calc(100vw-2rem)] hidden">
+            <div class="max-w-screen-lg mx-auto">
                 <a href="/" class="block bg-pink-700 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Home</a>
+                <a href="/about" class="block bg-pink-700 hover:bg-pink-400 text-white px-4 py-2 rounded-md">About</a>
                 <a href="/saved_exhibitions" class="block bg-pink-700 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Saved</a>
 
                 {% if current_user.is_authenticated %}
@@ -60,7 +64,7 @@
                 
                 <a href="/create_exhibit" class="block bg-pink-700 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Create Exhibition</a>
                 
-                <a href="#" onclick="togglePopup()" class="block bg-pink-700 hover:bg-pink-400 text-white px-4 py-2 rounded-md border border-pink-500 cursor-pointer">Filter Exhibitions</a>
+                <a href="#" onclick="togglePopup()" class="block bg-pink-700 hover:bg-pink-400 text-white px-4 py-2 rounded-md">Filter Exhibitions</a>
             </div>
         </div>
     </nav>
@@ -124,6 +128,10 @@
                 <label class="inline-flex items-center">
                     <input type="checkbox" name="event_type" value="Exhibit" class="form-checkbox h-5 w-5 text-pink-600">
                     <span class="ml-2 text-pink-800">Exhibit</span>
+                </label><br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="event_type" value="Showcase" class="form-checkbox h-5 w-5 text-pink-600">
+                    <span class="ml-2 text-pink-800">Showcase</span>
                 </label>
             </div>
 

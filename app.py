@@ -2,15 +2,13 @@
 """
 Pinkberries flask-based web application.
 """
-from datetime import date
 import os
 import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import pymongo
 from bson.objectid import ObjectId
 from dotenv import load_dotenv, dotenv_values  ### You will need to install dotenv from terminal
-from pymongo import MongoClient
 import certifi # resolve connection error for mongoDB
 
 # Load environment variables
@@ -83,7 +81,9 @@ def home():
         print(f"Error occurred while fetching exhibitions: {e}")
         return f"An error occurred while fetching the exhibitions: {e}", 500
 
-
+@app.route("/about")
+def about():
+    return render_template('about.html')
 
 @app.route("/filter", methods=["GET"])
 def filter_exhibitions():
