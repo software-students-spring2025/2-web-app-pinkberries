@@ -65,6 +65,9 @@ def load_user(owner_id):
 
 @app.route("/")
 def home():
+    """
+    Homepage where users can browse exhibitions.
+    """
     try:
         # Fetch all exhibitions from the database without date filtering
         exhibitions = list(db.exhibitions.find())
@@ -83,6 +86,9 @@ def home():
 
 @app.route("/about")
 def about():
+    """
+    Has info about site.
+    """
     return render_template('about.html')
 
 @app.route("/filter", methods=["GET"])
