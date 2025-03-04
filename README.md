@@ -26,8 +26,54 @@ Our platform connects art enthusiasts with galleries, making it easier to discov
 
 ## Steps necessary to run the software
 
-See instructions. Delete this line and place instructions to download, configure, and run the software here.
+### Prerequisites
+Ensure the following are installed on your system:
+- Python 3.8+
+- MongoDB (local or Atlas account)
+- Git
 
+### Set-up
+#### 1. Clone the repository
+```
+git clone https://github.com/software-students-spring2025/2-web-app-pinkberries.git
+cd 2-web-app-pinkberries
+```
+#### 2. Set up a virtual environment
+```
+python -m venv venv
+```
+Replace `python` with `python3` if necessary. 
+#### 3. Activate the virtual environment
+- on macOS/Linux:
+```
+source venv/bin/activate
+```
+- on Windows:
+```
+venv\Scripts\activate
+```
+#### 4. Install dependencies
+```
+pip install -r requirements.txt
+```
+Replace `pip` with `pip3` if necessary.
+#### 5. Configure .env file
+- Create a file in the root directory called `.env`
+- Edit the `.env` file by referencing the `example.env` file provided:
+  - set `MONGO_URI` to your MongoDB connection string
+  - set `MONGO_DB` to your database name
+
+### Run application
+#### Seed file (optional)
+- If you would like to see the website with sample exhibitions pre-populated, run the following beforehand:
+```
+python seed_exhibitions.py
+```
+Run the application as follows:
+```
+flask run
+```
+By default, it will run on http://127.0.0.1:5000.
 ## Task boards
 
 - [Sprint 1 Task Board](https://github.com/orgs/software-students-spring2025/projects/47)
