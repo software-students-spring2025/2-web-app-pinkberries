@@ -340,7 +340,7 @@ def edit_post(exhibition_id):
     if updated_exhibition:
         db.exhibitions.update_one({"_id": ObjectId(exhibition_id)}, {"$set": updated_exhibition})
 
-    return redirect(url_for("my_exhibits", exhibition_id=exhibition_id))
+    return redirect(url_for("exhibition_detail", exhibition_id=exhibition_id))
 
 
 

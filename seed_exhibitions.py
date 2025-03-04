@@ -21,7 +21,7 @@ sample_exhibitions = [
         "location": "ArtSpace Gallery, New York",
         "cost": 15.00,
         "artist": {
-            "name": "Alice Monet",
+            "artist": "Alice Monet",
             "profile_url": "https://artistportfolio.com/alice-monet"
         },
         "art_style": "Impressionist",
@@ -41,7 +41,7 @@ sample_exhibitions = [
         "location": "Downtown Arts Hub, LA",
         "cost": 20.00,
         "artist": {
-            "name": "Leo Stark",
+            "artist": "Leo Stark",
             "profile_url": "https://artistportfolio.com/leo-stark"
         },
         "art_style": "Modern",
@@ -61,7 +61,7 @@ sample_exhibitions = [
         "location": "Gallery 77, Chicago",
         "cost": 10.00,
         "artist": {
-            "name": "Samantha Raye",
+            "artist": "Samantha Raye",
             "profile_url": "https://artistportfolio.com/samantha-raye"
         },
         "art_style": "Abstract",
@@ -77,7 +77,7 @@ sample_exhibitions = [
         "dates": {"start": "2025-05-20", "end": "2025-06-30"},
         "location": "Astro Arts Center, San Francisco",
         "cost": 12.00,
-        "artist": {"name": "Zane Vega", "profile_url": "https://artistportfolio.com/zane-vega"},
+        "artist": {"artist": "Zane Vega", "profile_url": "https://artistportfolio.com/zane-vega"},
         "art_style": "Psychedelic",
         "art_medium": "Interactive Installations",
         "event_type": "Exhibition",
@@ -91,7 +91,7 @@ sample_exhibitions = [
         "dates": {"start": "2025-10-01", "end": "2025-11-15"},
         "location": "Metro Arts District, Berlin",
         "cost": 8.00,
-        "artist": {"name": "Kai Richter", "profile_url": "https://artistportfolio.com/kai-richter"},
+        "artist": {"artist": "Kai Richter", "profile_url": "https://artistportfolio.com/kai-richter"},
         "art_style": "Street Art",
         "art_medium": "Mixed Media",
         "event_type": "Exhibition",
@@ -105,7 +105,7 @@ sample_exhibitions = [
         "dates": {"start": "2025-08-05", "end": "2025-09-10"},
         "location": "Nocturne Gallery, Tokyo",
         "cost": 22.00,
-        "artist": {"name": "Haruto Kuroi", "profile_url": "https://artistportfolio.com/haruto-kuroi"},
+        "artist": {"artist": "Haruto Kuroi", "profile_url": "https://artistportfolio.com/haruto-kuroi"},
         "art_style": "Gothic",
         "art_medium": "Photography & Installations",
         "event_type": "Immersive Experience",
@@ -119,7 +119,7 @@ sample_exhibitions = [
         "dates": {"start": "2025-07-01", "end": "2025-07-31"},
         "location": "Modern Spaces, Copenhagen",
         "cost": 14.50,
-        "artist": {"name": "Elena Voss", "profile_url": "https://artistportfolio.com/elena-voss"},
+        "artist": {"artist": "Elena Voss", "profile_url": "https://artistportfolio.com/elena-voss"},
         "art_style": "Minimalism",
         "art_medium": "Sculptures & Paintings",
         "event_type": "Exhibition",
@@ -133,7 +133,7 @@ sample_exhibitions = [
         "dates": {"start": "2025-11-20", "end": "2026-01-10"},
         "location": "TechArts Lab, Seoul",
         "cost": 30.00,
-        "artist": {"name": "Jin Seo", "profile_url": "https://artistportfolio.com/jin-seo"},
+        "artist": {"artist": "Jin Seo", "profile_url": "https://artistportfolio.com/jin-seo"},
         "art_style": "Cyberpunk",
         "art_medium": "Digital Art & VR",
         "event_type": "Showcase",
